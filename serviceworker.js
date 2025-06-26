@@ -1,12 +1,9 @@
-const CACHE_NAME = "kwm-cache";
+const CACHE_NAME = "evently-cache-v7";
 const CACHED_URLS = [
-    "CSS/materialize.min.css",
     "CSS/styles.css",
     "IMGs/Icons/icon-144.png",
     "JS/app.js",
-    "JS/materialize.min.js",
     "index.html",
-    "/",
     "manifest.webmanifest",
 ];
 
@@ -37,7 +34,7 @@ self.addEventListener("activate",(event)=>{
         caches.keys().then((cacheNames)=>{
             return Promise.all(
                 cacheNames.map((cacheName)=>{
-                    if(CACHE_NAME !== cacheName && cacheName.startsWith("kwm-cache")){
+                    if(CACHE_NAME !== cacheName && cacheName.startsWith("evently-cache-")) {
                         console.log("Deleting old cache:", cacheName);
                         return caches.delete(cacheName);
                     }
