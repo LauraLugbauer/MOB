@@ -8,7 +8,7 @@ scope ${registration.scope}`);}
             err);});
 }
 
-// API einbinden und Eventlistener setzen
+// API einbinden
 document.addEventListener("DOMContentLoaded", () => {
     // Standard-Suche nach Events in Wien
     fetchEvents("vienna");
