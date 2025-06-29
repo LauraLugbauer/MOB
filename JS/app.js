@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Funktion zum Abrufen von Events über die Ticketmaster API
 async function fetchEvents(keyword) {
-    const API_KEY = "…";
+    const API_KEY = "Ogln6rgdScGA7v55rV1GL5gDH3f3pLw9";
     const url = `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${API_KEY}&keyword=${encodeURIComponent(keyword)}&size=10`;
     console.log("[fetchEvents] URL:", url);
 
