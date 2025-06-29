@@ -29,24 +29,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Funktion zum Abrufen von Events über die Ticketmaster API
 async function fetchEvents(keyword) {
-    const API_KEY = "Ogln6rgdScGA7v55rV1GL5gDH3f3pLw9";
-    const BASE_URL = "https://app.ticketmaster.com/discovery/v2/events.json";
-    const url = `${BASE_URL}?apikey=${API_KEY}&keyword=${encodeURIComponent(keyword)}&size=10`;
+    const API_KEY = "…";
+    const url = `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${API_KEY}&keyword=${encodeURIComponent(keyword)}&size=10`;
+    console.log("[fetchEvents] URL:", url);
 
     try {
         const response = await fetch(url);
-        if (!response.ok) throw new Error("Fehler beim Laden der Events");
+        console.log("[fetchEvents] HTTP-Status:", response.status, response.statusText);
+
+        if (!response.ok) {
+            throw new Error(`HTTP-Fehler ${response.status}`);
+        }
 
         const data = await response.json();
+        console.log("[fetchEvents] Rohdaten:", data);
+
         const events = data._embedded?.events || [];
+        console.log(`[fetchEvents] Gefundene Events (${events.length}):`, events);
 
         renderEvents(events);
-    } catch (error) {
-        console.error("API Fehler:", error);
-        const container = document.getElementById("events");
-        if (container) {
-            container.innerHTML = "<p>Fehler beim Laden der Events.</p>";
-        }
+    } catch (err) {
+        console.error("[fetchEvents] Fehler:", err);
+        // … Fehlermeldung ins DOM …
     }
 }
 

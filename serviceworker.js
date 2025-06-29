@@ -1,7 +1,7 @@
-const CACHE_NAME = "evently-cache-v7";
+const CACHE_NAME = "evently-cache-v10";
 const CACHED_URLS = [
     "CSS/styles.css",
-    "IMGs/Icons/icon-144.png",
+    "IMGs/Icons/icon-144v2.png",
     "JS/app.js",
     "index.html",
     "manifest.webmanifest",
