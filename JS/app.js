@@ -112,7 +112,7 @@ function renderEvents(events) {
         card.innerHTML = `
             <div class="card-content">
                 <span class="card-title">${event.name}</span>
-                <p>${event.dates.start.localDate} – ${event._embedded?.venues?.[0]?.name || "Veranstaltungsort siehe 'Mehr Infos"}</p>
+                <p>${event.dates.start.localDate} – ${event._embedded?.venues?.[0]?.name || "Veranstaltungsort siehe 'Mehr Infos'"}</p>
                 <p><em>Kategorie: ${translatedType}</em></p>
                 <a href="${event.url}" target="_blank">Mehr Infos</a>
             </div>
