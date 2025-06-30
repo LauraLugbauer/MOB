@@ -95,12 +95,15 @@ function renderEvents(events) {
     }
 
     events.forEach(event => {
+        const eventType = event.classifications?.[0]?.segment?.name || "Keine Angabe";
+
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
             <div class="card-content">
                 <span class="card-title">${event.name}</span>
                 <p>${event.dates.start.localDate} – ${event._embedded?.venues?.[0]?.name || "Ort unter Mehr-Infos sichtbar"}</p>
+                <p><em>Art: ${eventType}</em></p>
                 <a href="${event.url}" target="_blank">Mehr Infos</a>
             </div>
         `;
