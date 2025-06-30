@@ -105,14 +105,24 @@ function renderEvents(events) {
 
     events.forEach(event => {
         const rawType = event.classifications?.[0]?.segment?.name || "Undefined";
-        const translatedType = categoryTranslations[rawType] || rawType;
+        const translatedType = categoryTranslations[rawType] || rawType
+
+        const rawDate = event.dates.start.localDate;
+        const dateObj = new Date(rawDate);
+
+        //in deutsches Format bringen
+        const formattedDate = dateObj.toLocaleDateString('de-DE', {
+            day:   '2-digit',
+            month: '2-digit',
+            year:  'numeric'
+        });
 
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
             <div class="card-content">
                 <span class="card-title">${event.name}</span>
-                <p>${event.dates.start.localDate} – ${event._embedded?.venues?.[0]?.name || "Veranstaltungsort siehe 'Mehr Infos'"}</p>
+                <p>${formattedDate} – ${event._embedded?.venues?.[0]?.name || "Veranstaltungsort siehe 'Mehr Infos'"}</p>
                 <p><em>Kategorie: ${translatedType}</em></p>
                 <a href="${event.url}" target="_blank">Mehr Infos</a>
             </div>
