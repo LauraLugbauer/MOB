@@ -1,36 +1,63 @@
-if ("serviceWorker" in navigator){
+let currentPage = 0;
+let currentKeyword = "";
+
+// Registrierung des Service Workers
+if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("serviceworker.js")
-        .then(
-            registration => {console.log(`Service Worker registered with 
-scope ${registration.scope}`);}
-        )
-        .catch( err=> {console.log("Service Worker registration failed: ",
-            err);});
+        .then(registration => {
+            console.log(`Service Worker registered with scope ${registration.scope}`);
+        })
+        .catch(err => {
+            console.log("Service Worker registration failed: ", err);
+        });
 }
 
-// API einbinden
+// DOM geladen
 document.addEventListener("DOMContentLoaded", () => {
-    // Standard-Suche nach Events in Wien
-    fetchEvents("vienna");
+    // Standard: erste Seite Events laden
+    fetchEvents();
 
-    // Event-Handler für Suchfunktion (optional)
     const searchBtn = document.getElementById("searchBtn");
     const searchInput = document.getElementById("search");
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
+    const loadLessBtn = document.getElementById("loadLessBtn");
 
     if (searchBtn && searchInput) {
         searchBtn.addEventListener("click", () => {
             const keyword = searchInput.value.trim();
-            if (keyword) {
-                fetchEvents(keyword);
+            currentKeyword = keyword;
+            currentPage = 0;
+            clearEvents();
+            fetchEvents(keyword);
+        });
+    }
+
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener("click", () => {
+            currentPage++;
+            fetchEvents(currentKeyword, currentPage);
+        });
+    }
+
+    if (loadLessBtn) {
+        loadLessBtn.addEventListener("click", () => {
+            if (currentPage > 0) {
+                removeLastEvents();
+                currentPage--;
             }
         });
     }
 });
 
-// Funktion zum Abrufen von Events über die Ticketmaster API
-async function fetchEvents(keyword) {
+// Events von der API laden
+async function fetchEvents(keyword = "", page = 0) {
     const API_KEY = "Ogln6rgdScGA7v55rV1GL5gDH3f3pLw9";
-    const url = `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${API_KEY}&keyword=${encodeURIComponent(keyword)}&size=10`;
+    let url = `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${API_KEY}&countryCode=AT&size=20&page=${page}`;
+
+    if (keyword && keyword.length > 0) {
+        url += `&keyword=${encodeURIComponent(keyword)}`;
+    }
+
     console.log("[fetchEvents] URL:", url);
 
     try {
@@ -50,19 +77,20 @@ async function fetchEvents(keyword) {
         renderEvents(events);
     } catch (err) {
         console.error("[fetchEvents] Fehler:", err);
-        // … Fehlermeldung ins DOM …
+        const container = document.getElementById("events");
+        if (container && page === 0) {
+            container.innerHTML = "<p>Fehler beim Laden der Events.</p>";
+        }
     }
 }
 
-// Funktion zum Anzeigen der Events im DOM
+// Events im DOM anzeigen
 function renderEvents(events) {
     const container = document.getElementById("events");
     if (!container) return;
 
-    container.innerHTML = "";
-
-    if (events.length === 0) {
-        container.innerHTML = "<p>Keine Events gefunden.</p>";
+    if (events.length === 0 && currentPage === 0) {
+        container.innerHTML = "<p>Keine Events in Österreich gefunden.</p>";
         return;
     }
 
@@ -80,5 +108,23 @@ function renderEvents(events) {
     });
 }
 
+// Alle Events entfernen (z. B. bei neuer Suche)
+function clearEvents() {
+    const container = document.getElementById("events");
+    if (container) {
+        container.innerHTML = "";
+    }
+}
 
+// Letzte 20 Events entfernen
+function removeLastEvents() {
+    const container = document.getElementById("events");
+    if (!container) return;
 
+    const cards = container.querySelectorAll(".card");
+    const totalCards = cards.length;
+
+    for (let i = totalCards - 1; i >= totalCards - 20 && i >= 0; i--) {
+        container.removeChild(cards[i]);
+    }
+}
