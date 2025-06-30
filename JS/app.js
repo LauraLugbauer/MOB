@@ -1,3 +1,18 @@
+window.buildMapsUrl       = async function(venue) {
+    if (venue.location?.latitude && venue.location?.longitude) {
+        return `https://www.google.com/maps/search/?api=1&query=${venue.location.latitude},${venue.location.longitude}`;
+    }
+    // Beispiel: wilde Geocoding-Anfrage (benötigt eigenen API-Key)
+    const address = encodeURIComponent([venue.name, venue.city?.name].filter(Boolean).join(', '));
+    const geoRes = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=DEIN_GOOGLE_KEY`);
+    const json = await geoRes.json();
+    const loc = json.results?.[0]?.geometry?.location;
+    return loc
+        ? `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`
+        : '#';
+};
+
+
 let currentPage = 0;
 let currentKeyword = "";
 
@@ -103,12 +118,15 @@ function renderEvents(events) {
         return;
     }
 
-    events.forEach(event => {
+    events.forEach(async event => {
         const rawType = event.classifications?.[0]?.segment?.name || "Undefined";
         const translatedType = categoryTranslations[rawType] || rawType
 
         const rawDate = event.dates.start.localDate;
         const dateObj = new Date(rawDate);
+
+        const venue = event._embedded?.venues?.[0] || {};
+        const mapsUrl = await buildMapsUrl(venue);
 
         //in deutsches Format bringen
         const formattedDate = dateObj.toLocaleDateString('de-DE', {
@@ -122,10 +140,13 @@ function renderEvents(events) {
         card.innerHTML = `
             <div class="card-content">
                 <span class="card-title">${event.name}</span>
-                <p>${formattedDate} – ${event._embedded?.venues?.[0]?.name || "Veranstaltungsort siehe 'Mehr Infos'"}</p>
+                <p>${formattedDate} – ${event._embedded?.venues?.[0]?.name || "für Veranstaltungsort siehe 'Mehr Infos'"}</p>
                 <p><em>Kategorie: ${translatedType}</em></p>
                 <a href="${event.url}" target="_blank">Mehr Infos</a>
             </div>
+            <div class="card-action">
+        <a href="${mapsUrl}" target="_blank">In Google Maps anzeigen</a>
+      </div>
         `;
         container.appendChild(card);
     });
@@ -150,4 +171,5 @@ function removeLastEvents() {
     for (let i = totalCards - 1; i >= totalCards - 20 && i >= 0; i--) {
         container.removeChild(cards[i]);
     }
+
 }
