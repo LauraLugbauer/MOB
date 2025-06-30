@@ -14,7 +14,6 @@ if ("serviceWorker" in navigator) {
 
 // DOM geladen
 document.addEventListener("DOMContentLoaded", () => {
-    // Standard: erste Seite Events laden
     fetchEvents();
 
     const searchBtn = document.getElementById("searchBtn");
@@ -48,6 +47,16 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+// Mapping englischer Kategorien zu Deutsch
+const categoryTranslations = {
+    "Music": "Musik",
+    "Sports": "Sport",
+    "Arts & Theatre": "Kunst & Theater",
+    "Film": "Film",
+    "Miscellaneous": "Verschiedenes",
+    "Undefined": "Nicht definiert"
+};
 
 // Events von der API laden
 async function fetchEvents(keyword = "", page = 0) {
@@ -95,15 +104,16 @@ function renderEvents(events) {
     }
 
     events.forEach(event => {
-        const eventType = event.classifications?.[0]?.segment?.name || "Keine Angabe";
+        const rawType = event.classifications?.[0]?.segment?.name || "Undefined";
+        const translatedType = categoryTranslations[rawType] || rawType;
 
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
             <div class="card-content">
                 <span class="card-title">${event.name}</span>
-                <p>${event.dates.start.localDate} – ${event._embedded?.venues?.[0]?.name || "Veranstaltungsort siehe 'Mehr Infos'"}</p>
-                <p><em>Kategorie: ${eventType}</em></p>
+                <p>${event.dates.start.localDate} – ${event._embedded?.venues?.[0]?.name || "Veranstaltungsort siehe 'Mehr Infos"}</p>
+                <p><em>Kategorie: ${translatedType}</em></p>
                 <a href="${event.url}" target="_blank">Mehr Infos</a>
             </div>
         `;
