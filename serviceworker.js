@@ -43,3 +43,23 @@ self.addEventListener("activate",(event)=>{
         })
     );
 });
+
+self.addEventListener('fetch', event => {
+    const url = new URL(event.request.url);
+
+    // Nur Ticketmaster-Requests abfangen
+    if (url.origin === 'https://app.ticketmaster.com') {
+        event.respondWith((async () => {
+            try {
+                const networkRes = await fetch(event.request);
+                const cache = await caches.open('dynamic-events');
+                cache.put(event.request, networkRes.clone());
+                return networkRes;
+            } catch {
+                return caches.match(event.request);
+            }
+        })());
+        return;
+    }
+});
+
