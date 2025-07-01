@@ -1,44 +1,108 @@
-<!-- events.html -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <title>Evently – Deine Events</title>
+
+    <!-- Material Icons für das Herz -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Materialize-CSS -->
     <link rel="stylesheet" href="CSS/materialize.min.css">
     <link rel="stylesheet" href="CSS/styles.css">
     <link rel="manifest" href="manifest.webmanifest">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
+
 <body class="teal lighten-5">
 <div class="container">
-    <a href="index.html">← Zurück</a>
-
-          <!-- Flex Container für Überschrift und Favoriten-Link -->
-        <div class="row">
-            <h2 class="col s12">Gefundene Events</h2>
-            <!-- Favoriten-Link wird rechts ausgerichtet -->
-            <div class="col s12 right-align">
-                <a href="favorites.html" class="btn teal darken-2">Zu den Favoriten</a>
-            </div>
+    <div class="row" style="margin-bottom:1rem;">
+        <!-- Link zurück -->
+        <div class="col s6">
+            <a href="index.html">← Zurück</a>
         </div>
-
-        <!-- Eventliste -->
-    <div id="events"></div>
-
-    <!-- Mehr laden Button -->
-    <div class="center-align" style="margin: 20px 0;">
-        <button id="loadMoreBtn" class="btn teal darken-2 white-text">Mehr laden</button>
-        <button id="loadLessBtn" class="btn grey lighten-1 black-text" style="margin-left: 10px;">Weniger anzeigen</button>
+        <!-- Favoriten-Button rechts -->
+        <div class="col s6 right-align">
+            <a href="favorites.html" class="btn teal darken-2 white-text">
+                <i class="material-icons left">favorite</i>Meine Favoriten
+            </a>
+        </div>
     </div>
 
-    <!-- Zurück-Link -->
-    <a href="events.html" class="btn blue-grey darken-2 white-text">
+
+    <h2>Gefundene Events</h2>
+
+    <div class="row">
+        <div class="col s12 m4">
+            <input type="text" id="search" placeholder="Suchbegriff eingeben">
+            <button id="searchBtn" class="btn teal darken-2 white-text" style="margin-top:8px;">
+                Suchen
+            </button>
+        </div>
+
+        <div class="col s12 m2">
+            <select id="categoryFilter">
+                <option value="">Alle Kategorien</option>
+                <option value="musik">Musik</option>
+                <option value="sport">Sport</option>
+                <option value="kunst & theater">Kunst & Theater</option>
+                <option value="verschiedenes">Verschiedenes</option>
+            </select>
+            <label>Kategorie</label>
+        </div>
+
+        <div class="col s12 m2">
+            <select id="monthFilter">
+                <option value="">Alle Monate</option>
+                <option value="2025-07">Juli 2025</option>
+                <option value="2025-08">August 2025</option>
+                <option value="2025-09">September 2025</option>
+                <option value="2025-10">Oktober 2025</option>
+                <option value="2025-11">November 2025</option>
+                <option value="2025-12">Dezember 2025</option>
+            </select>
+            <label>Monat</label>
+        </div>
+
+        <div class="col s12 m2">
+            <select id="locationFilter">
+                <option value="">Alle Städte</option>
+                <option value="wien">Wien</option>
+                <option value="linz">Linz</option>
+                <option value="salzburg">Salzburg</option>
+                <option value="graz">Graz</option>
+                <option value="innsbruck">Innsbruck</option>
+            </select>
+            <label>Ort</label>
+        </div>
+
+
+        <div class="col s12 m2" style="display:flex;align-items:flex-end;">
+            <button id="applyFiltersBtn" class="btn teal darken-2 white-text">Filtern</button>
+            <button id="resetFiltersBtn" class="btn grey lighten-1 black-text" style="margin-left:10px;">
+                Zurücksetzen
+            </button>
+        </div>
+
+    </div>
+
+    <div id="filterFeedback" style="margin-bottom:1rem;color:#333;font-style:italic;"></div>
+
+    <div id="events"></div>
+
+    <div class="center-align" style="margin:20px 0;">
+        <button id="loadMoreBtn" class="btn teal darken-2 white-text">Mehr laden</button>
+        <button id="loadLessBtn" class="btn grey lighten-1 black-text" style="margin-left:10px;">
+            Weniger anzeigen
+        </button>
+    </div>
+
+    <a href="index.html" class="btn blue-grey darken-2 white-text">
         <i class="material-icons left">Zurück</i>
     </a>
-
 </div>
 
-<!-- JavaScript -->
+<!-- Materialize JS -->
+<script src="JS/materialize.min.js"></script>
+<!-- Dein App-Skript -->
 <script src="JS/app.js"></script>
 </body>
 </html>
