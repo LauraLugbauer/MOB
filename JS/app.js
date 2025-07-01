@@ -39,8 +39,6 @@ const categoryTranslations = {
     "Miscellaneous": "Verschiedenes",
     "Undefined": "Nicht definiert"
 };
-
-// Mapping englischer Stadtnamen (API) → deutsche Werte (Dropdown)
 const cityMap = {
     vienna:    "wien",
     linz:      "linz",
@@ -51,22 +49,21 @@ const cityMap = {
 
 // -------------------- DOMContentLoaded --------------------
 document.addEventListener("DOMContentLoaded", () => {
-    // Materialize-Selects initialisieren (wenn genutzt)
+    // Materialize-Selects initialisieren (falls Materialize aktiv)
     if (window.M && M.FormSelect) {
         M.FormSelect.init(document.querySelectorAll('select'));
     }
 
-    // Erste Events laden
+    // erste Events laden
     fetchEvents();
 
-    // UI-Elemente
+    // UI-Elemente greifen
     const searchBtn       = document.getElementById("searchBtn");
     const searchInput     = document.getElementById("search");
     const loadMoreBtn     = document.getElementById("loadMoreBtn");
     const loadLessBtn     = document.getElementById("loadLessBtn");
     const applyFiltersBtn = document.getElementById("applyFiltersBtn");
     const resetFiltersBtn = document.getElementById("resetFiltersBtn");
-    const feedbackEl      = document.getElementById("filterFeedback");
 
     // Such-Button
     searchBtn?.addEventListener("click", () => {
@@ -74,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
         currentPage    = 0;
         clearEvents();
         fetchEvents(currentKeyword);
-        // nach neuer Suche Filters zurücksetzen und Buttons anzeigen
+        // Filter-Reset auslösen, damit Dropdowns zurückgesetzt werden
         resetFiltersBtn?.click();
     });
 
@@ -95,31 +92,27 @@ document.addEventListener("DOMContentLoaded", () => {
     // Filter anwenden
     applyFiltersBtn?.addEventListener("click", () => {
         applyFilters();
-        // Buttons verstecken
+        // Paginierungs-Buttons verstecken
         loadMoreBtn.style.display = "none";
         loadLessBtn.style.display = "none";
     });
 
     // Filter zurücksetzen
     resetFiltersBtn?.addEventListener("click", () => {
-        // 1) Filter-Felder leeren
-        document.getElementById("categoryFilter").value = "";
-        document.getElementById("monthFilter") .value = "";
-        document.getElementById("locationFilter").value = "";
+        // Dropdowns leeren
+        ["categoryFilter","monthFilter","locationFilter"]
+            .forEach(id => document.getElementById(id).value = "");
 
-        // 2) Materialize-Selects neu initialisieren (falls genutzt)
+        // Materialize-Selects neu initialisieren (wenn genutzt)
         if (window.M && M.FormSelect) {
             M.FormSelect.init(document.querySelectorAll('select'));
         }
 
-        // 3) Alle Event-Cards anzeigen
+        // alle Event-Cards wieder anzeigen
         document.querySelectorAll("#events .card")
             .forEach(card => card.style.display = "block");
 
-        // 4) Feedback-Text entfernen
-        if (feedbackEl) feedbackEl.textContent = "";
-
-        // 5) Buttons wieder einblenden
+        // Paginierungs-Buttons wieder einblenden
         loadMoreBtn.style.display = "";
         loadLessBtn.style.display = "";
     });
@@ -129,15 +122,13 @@ document.addEventListener("DOMContentLoaded", () => {
 async function fetchEvents(keyword = "", page = 0) {
     const API_KEY = "Ogln6rgdScGA7v55rV1GL5gDH3f3pLw9";
     let url = `https://app.ticketmaster.com/discovery/v2/events.json`
-        + `?apikey=${API_KEY}&countryCode=AT&size=30&page=${page}`;
-    if (keyword) {
-        url += `&keyword=${encodeURIComponent(keyword)}`;
-    }
+        + `?apikey=${API_KEY}&countryCode=AT&size=20&page=${page}`;
+    if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
 
     try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP-Fehler ${response.status}`);
-        const data   = await response.json();
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP-Fehler ${res.status}`);
+        const data   = await res.json();
         const events = data._embedded?.events || [];
         renderEvents(events);
     } catch (err) {
@@ -149,7 +140,7 @@ async function fetchEvents(keyword = "", page = 0) {
     }
 }
 
-// -------------------- Rendering der Events --------------------
+// -------------------- Rendering der Events inkl. Like-Logik --------------------
 function renderEvents(events) {
     const container = document.getElementById("events");
     if (!container) return;
@@ -161,27 +152,23 @@ function renderEvents(events) {
     events.forEach(async event => {
         const rawType     = event.classifications?.[0]?.segment?.name || "Undefined";
         const translated  = categoryTranslations[rawType] || rawType;
-
         const rawDate     = event.dates.start.localDate;
-        const formatted   = new Date(rawDate)
-            .toLocaleDateString('de-DE', {
-                day:   '2-digit',
-                month: '2-digit',
-                year:  'numeric'
-            });
+        const formatted   = new Date(rawDate).toLocaleDateString('de-DE', {
+            day: '2-digit', month: '2-digit', year: 'numeric'
+        });
+        const venue       = event._embedded?.venues?.[0] || {};
+        const engCity     = (venue.city?.name || "").toLowerCase();
+        const city        = cityMap[engCity] || engCity;
+        const mapsUrl     = await buildMapsUrl(venue);
 
-        const venue   = event._embedded?.venues?.[0] || {};
-        const engCity = (venue.city?.name || "").toLowerCase();
-        const city    = cityMap[engCity] || engCity;
-
-        const mapsUrl = await buildMapsUrl(venue);
-
+        // Karte erzeugen
         const card = document.createElement("div");
         card.className = "card";
         card.dataset.category = translated.toLowerCase();
         card.dataset.date     = rawDate;
         card.dataset.city     = city;
 
+        // Inhalt inkl. Like-Button
         card.innerHTML = `
             <div class="card-content">
                 <span class="card-title">${event.name}</span>
@@ -189,12 +176,45 @@ function renderEvents(events) {
                 <p><em>Kategorie: ${translated}</em></p>
                 <a href="${event.url}" target="_blank">Mehr Infos</a>
             </div>
-            <div class="card-action">
+            <div class="card-action" style="display:flex;justify-content:space-between;align-items:center;">
                 <a href="${mapsUrl}" target="_blank">In Google Maps anzeigen</a>
+                <button class="btn-flat like-btn" data-event-id="${event.id}" style="min-width:40px;">
+                    <i class="material-icons">
+                        ${isEventInFavorites(event.id) ? "favorite" : "favorite_border"}
+                    </i>
+                </button>
             </div>
         `;
         container.appendChild(card);
+
+        // Like-Button-Handler
+        const likeBtn = card.querySelector(".like-btn");
+        likeBtn.addEventListener("click", () => {
+            toggleFavorite(event, likeBtn);
+        });
     });
+}
+
+// -------------------- Favoriten-Logik --------------------
+function isEventInFavorites(eventId) {
+    const favs = JSON.parse(localStorage.getItem("favorites")) || [];
+    return favs.some(f => f.id === eventId);
+}
+
+function toggleFavorite(event, buttonElement) {
+    let favs = JSON.parse(localStorage.getItem("favorites")) || [];
+    const idx = favs.findIndex(f => f.id === event.id);
+    const icon = buttonElement.querySelector("i");
+
+    if (idx === -1) {
+        favs.push(event);
+        icon.textContent = "favorite";
+    } else {
+        favs.splice(idx, 1);
+        icon.textContent = "favorite_border";
+    }
+
+    localStorage.setItem("favorites", JSON.stringify(favs));
 }
 
 // -------------------- Aufräumfunktionen --------------------
@@ -211,13 +231,12 @@ function removeLastEvents() {
 
 // -------------------- Filterfunktion --------------------
 function applyFilters() {
-    const selCat  = document.getElementById("categoryFilter").value.toLowerCase();
-    const selMon  = document.getElementById("monthFilter").value;
-    const selCity = document.getElementById("locationFilter").value.toLowerCase();
-    const feedbackEl = document.getElementById("filterFeedback");
-
-    const allCards     = document.querySelectorAll("#events .card");
-    let visibleCount   = 0;
+    const selCat    = document.getElementById("categoryFilter").value.toLowerCase();
+    const selMon    = document.getElementById("monthFilter").value;
+    const selCity   = document.getElementById("locationFilter").value.toLowerCase();
+    const feedbackEl= document.getElementById("filterFeedback");
+    const allCards  = document.querySelectorAll("#events .card");
+    let visibleCount = 0;
 
     allCards.forEach(card => {
         const cat  = card.dataset.category;
@@ -233,8 +252,42 @@ function applyFilters() {
         if (show) visibleCount++;
     });
 
-    // Feedback anzeigen
+    // Feedback
     if (feedbackEl) {
-        feedbackEl.textContent = `Gefiltert: ${visibleCount} Event(s) verfügbar.`;
+        feedbackEl.textContent = `Gefiltert: ${visibleCount} von ${allCards.length} Events.`;
     }
+}
+
+
+// -------------------- Favoriten-Ansicht rendern --------------------
+function renderFavorites() {
+    const container = document.getElementById("favorites");
+    container.innerHTML = "";  // alte Inhalte löschen
+
+    const favs = JSON.parse(localStorage.getItem("favorites")) || [];
+    if (favs.length === 0) {
+        container.innerHTML = "<p>Du hast noch keine Favoriten.</p>";
+        return;
+    }
+
+    favs.forEach(event => {
+        const rawType     = event.classifications?.[0]?.segment?.name || "Undefined";
+        const translated  = categoryTranslations[rawType] || rawType;
+        const rawDate     = event.dates.start.localDate;
+        const formatted   = new Date(rawDate)
+            .toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
+        const venueName   = event._embedded?.venues?.[0]?.name || "Unbekannter Ort";
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+      <div class="card-content">
+        <span class="card-title">${event.name}</span>
+        <p>${formatted} – ${venueName}</p>
+        <p><em>Kategorie: ${translated}</em></p>
+        <a href="${event.url}" target="_blank">Mehr Infos</a>
+      </div>
+    `;
+        container.appendChild(card);
+    });
 }

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Evently – Deine Favoriten</title>
+
+    <!-- Material Icons für das Lieblings-Herz -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Materialize-CSS & eigene Styles -->
+    <link rel="stylesheet" href="CSS/materialize.min.css">
+    <link rel="stylesheet" href="CSS/styles.css">
+    <link rel="manifest" href="manifest.webmanifest">
+</head>
+<body class="teal lighten-5">
+<div class="container">
+    <!-- Zurück zu Events -->
+    <a href="events.html" class="btn blue-grey darken-2 white-text" style="margin-bottom:1rem;">
+        <i class="material-icons left">arrow_back</i>Zurück zu Events
+    </a>
+
+    <h2>Deine Favoriten</h2>
+    <!-- Hier werden die Favoriten-Karten gerendert -->
+    <div id="favorites"></div>
+</div>
+
+<!-- Materialize-JS (für Selects, falls nötig) -->
+<script src="JS/materialize.min.js"></script>
+<!-- Like-/Favorite-Logik -->
+<script src="JS/app.js"></script>
+<script>
+    // Sobald app.js geladen ist, rufen wir die Favoriten-Render-Funktion auf:
+    document.addEventListener("DOMContentLoaded", () => {
+        // Gibt es Favoriten? Funktion renderFavorites aus app.js nutzen:
+        if (typeof renderFavorites === "function") {
+            renderFavorites();
+        }
+    });
+</script>
+</body>
+</html>
