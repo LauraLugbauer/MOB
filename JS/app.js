@@ -1,31 +1,54 @@
-// JS/app.js
-
-// -------------------- Helferfunktion für Google-Maps-Link --------------------
-window.buildMapsUrl = async function(venue) {
-    if (venue.location?.latitude && venue.location?.longitude) {
-        return `https://www.google.com/maps/search/?api=1&query=${venue.location.latitude},${venue.location.longitude}`;
-    }
-    const address = encodeURIComponent(
-        [venue.name, venue.city?.name]
-            .filter(Boolean)
-            .join(', ')
-    );
-    return `https://www.google.com/maps/search/?api=1&query=${address}`;
-};
-
-// -------------------- App-State --------------------
-let displayLimit   = 20;   // Wie viele Events wir standardmäßig anzeigen
+let currentPage = 0;
 let currentKeyword = "";
-let allEvents      = [];   // Speichert alle per API geladenen Events
 
-// -------------------- Service-Worker-Registrierung --------------------
+// Registrierung des Service Workers
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("serviceworker.js")
-        .then(reg => console.log(`SW registered, scope: ${reg.scope}`))
-        .catch(err => console.log("SW registration failed:", err));
+        .then(registration => {
+            console.log(`Service Worker registered with scope ${registration.scope}`);
+        })
+        .catch(err => {
+            console.log("Service Worker registration failed: ", err);
+        });
 }
 
-// -------------------- Übersetzungen --------------------
+// DOM geladen
+document.addEventListener("DOMContentLoaded", () => {
+    fetchEvents();
+
+    const searchBtn = document.getElementById("searchBtn");
+    const searchInput = document.getElementById("search");
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
+    const loadLessBtn = document.getElementById("loadLessBtn");
+
+    if (searchBtn && searchInput) {
+        searchBtn.addEventListener("click", () => {
+            const keyword = searchInput.value.trim();
+            currentKeyword = keyword;
+            currentPage = 0;
+            clearEvents();
+            fetchEvents(keyword);
+        });
+    }
+
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener("click", () => {
+            currentPage++;
+            fetchEvents(currentKeyword, currentPage);
+        });
+    }
+
+    if (loadLessBtn) {
+        loadLessBtn.addEventListener("click", () => {
+            if (currentPage > 0) {
+                removeLastEvents();
+                currentPage--;
+            }
+        });
+    }
+});
+
+// Mapping englischer Kategorien zu Deutsch
 const categoryTranslations = {
     "Music": "Musik",
     "Sports": "Sport",
@@ -34,225 +57,154 @@ const categoryTranslations = {
     "Miscellaneous": "Verschiedenes",
     "Undefined": "Nicht definiert"
 };
-const cityMap = {
-    vienna:    "wien",
-    linz:      "linz",
-    salzburg:  "salzburg",
-    graz:      "graz",
-    innsbruck: "innsbruck"
-};
 
-// -------------------- DOMContentLoaded --------------------
-document.addEventListener("DOMContentLoaded", () => {
-    // Materialize-Selects initialisieren (falls Materialize geladen)
-    if (window.M && M.FormSelect) {
-        M.FormSelect.init(document.querySelectorAll('select'));
-    }
-
-    // Erstes Laden
-    fetchEvents();
-
-    // UI-Elemente
-    const searchBtn       = document.getElementById("searchBtn");
-    const searchInput     = document.getElementById("search");
-    const loadMoreBtn     = document.getElementById("loadMoreBtn");
-    const loadLessBtn     = document.getElementById("loadLessBtn");
-    const applyFiltersBtn = document.getElementById("applyFiltersBtn");
-    const resetFiltersBtn = document.getElementById("resetFiltersBtn");
-
-    // Suche starten
-    searchBtn?.addEventListener("click", () => {
-        currentKeyword = searchInput.value.trim();
-        displayLimit   = 20;
-        allEvents      = [];
-        clearEvents();
-        fetchEvents(currentKeyword);
-        resetFiltersBtn?.click();
-    });
-
-    // Mehr laden: einfach Limit erhöhen und neu rendern
-    loadMoreBtn?.addEventListener("click", () => {
-        displayLimit += 20;
-        renderEvents(allEvents.slice(0, displayLimit));
-    });
-
-    // Weniger anzeigen: Limit reduzieren und neu rendern
-    loadLessBtn?.addEventListener("click", () => {
-        if (displayLimit > 20) {
-            displayLimit -= 20;
-            renderEvents(allEvents.slice(0, displayLimit));
-        }
-    });
-
-    // Filter anwenden
-    applyFiltersBtn?.addEventListener("click", () => {
-        applyFilters();
-        loadMoreBtn.style.display = "none";
-        loadLessBtn.style.display = "none";
-    });
-
-    // Filter zurücksetzen
-    resetFiltersBtn?.addEventListener("click", () => {
-        ["categoryFilter","monthFilter","locationFilter"]
-            .forEach(id => document.getElementById(id).value = "");
-        if (window.M && M.FormSelect) {
-            M.FormSelect.init(document.querySelectorAll('select'));
-        }
-        renderEvents(allEvents.slice(0, displayLimit));
-        loadMoreBtn.style.display = "";
-        loadLessBtn.style.display = "";
-        const fb = document.getElementById("filterFeedback");
-        if (fb) fb.textContent = "";
-    });
-});
-
-// -------------------- API-Aufruf --------------------
+// Events von der API laden
 async function fetchEvents(keyword = "", page = 0) {
     const API_KEY = "Ogln6rgdScGA7v55rV1GL5gDH3f3pLw9";
-    // Wir laden jetzt 100 auf einen Schlag, um genug Daten zum Filtern & Paginating zu haben
-    let url = `https://app.ticketmaster.com/discovery/v2/events.json`
-        + `?apikey=${API_KEY}&countryCode=AT&size=200&page=${page}`;
-    if (keyword) {
+    let url = `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${API_KEY}&countryCode=AT&size=20&page=${page}`;
+
+    if (keyword && keyword.length > 0) {
         url += `&keyword=${encodeURIComponent(keyword)}`;
     }
 
+    console.log("[fetchEvents] URL:", url);
+
     try {
-        const res    = await fetch(url);
-        if (!res.ok) throw new Error(`HTTP-Fehler ${res.status}`);
-        const data   = await res.json();
+        const response = await fetch(url);
+        console.log("[fetchEvents] HTTP-Status:", response.status, response.statusText);
+
+        if (!response.ok) {
+            throw new Error(`HTTP-Fehler ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("[fetchEvents] Rohdaten:", data);
+
         const events = data._embedded?.events || [];
+        console.log(`[fetchEvents] Gefundene Events (${events.length}):`, events);
 
-        // Alle geladenen Events cachen
-        allEvents = allEvents.concat(events);
-
-        // Die ersten displayLimit rendern
-        renderEvents(allEvents.slice(0, displayLimit));
+        renderEvents(events);
     } catch (err) {
         console.error("[fetchEvents] Fehler:", err);
-        if (allEvents.length === 0) {
-            document.getElementById("events").innerHTML
-                = "<p>Fehler beim Laden der Events.</p>";
+        const container = document.getElementById("events");
+        if (container && page === 0) {
+            container.innerHTML = "<p>Fehler beim Laden der Events.</p>";
         }
     }
 }
 
-// -------------------- Rendering der Events inkl. Like-Logik --------------------
+// Events im DOM anzeigen
 function renderEvents(events) {
     const container = document.getElementById("events");
     if (!container) return;
-    container.innerHTML = "";  // jedes Mal sauber leeren
 
-    if (events.length === 0) {
-        container.innerHTML = "<p>Keine Events gefunden.</p>";
+    if (events.length === 0 && currentPage === 0) {
+        container.innerHTML = "<p>Keine Events in Österreich gefunden.</p>";
         return;
     }
 
-    events.forEach(async event => {
-        const rawType    = event.classifications?.[0]?.segment?.name || "Undefined";
-        const translated = categoryTranslations[rawType] || rawType;
-        const rawDate    = event.dates.start.localDate;
-        const formatted  = new Date(rawDate).toLocaleDateString('de-DE', {
-            day: '2-digit', month: '2-digit', year: 'numeric'
-        });
-        const venue      = event._embedded?.venues?.[0] || {};
-        const engCity    = (venue.city?.name || "").toLowerCase();
-        const city       = cityMap[engCity] || engCity;
-        const mapsUrl    = await buildMapsUrl(venue);
+    events.forEach(event => {
+        const rawType = event.classifications?.[0]?.segment?.name || "Undefined";
+        const translatedType = categoryTranslations[rawType] || rawType;
 
         const card = document.createElement("div");
         card.className = "card";
-        card.dataset.category = translated.toLowerCase();
-        card.dataset.date     = rawDate;
-        card.dataset.city     = city;
-
         card.innerHTML = `
             <div class="card-content">
                 <span class="card-title">${event.name}</span>
-                <p>${formatted} – ${venue.name || "Veranstaltungsort siehe 'Mehr Infos'"}</p>
-                <p><em>Kategorie: ${translated}</em></p>
+                <p>${event.dates.start.localDate} – ${event._embedded?.venues?.[0]?.name || "Veranstaltungsort siehe 'Mehr Infos'"}</p>
+                <p><em>Kategorie: ${translatedType}</em></p>
                 <a href="${event.url}" target="_blank">Mehr Infos</a>
             </div>
-            <div class="card-action" style="display:flex;justify-content:space-between;align-items:center;">
-                <a href="${mapsUrl}" target="_blank">In Google Maps anzeigen</a>
+        `;
+        container.appendChild(card);
+    });
+}
+
+// Alle Events entfernen (z. B. bei neuer Suche)
+function clearEvents() {
+    const container = document.getElementById("events");
+    if (container) {
+        container.innerHTML = "";
+    }
+}
+
+// Letzte 20 Events entfernen
+function removeLastEvents() {
+    const container = document.getElementById("events");
+    if (!container) return;
+
+    const cards = container.querySelectorAll(".card");
+    const totalCards = cards.length;
+
+    for (let i = totalCards - 1; i >= totalCards - 20 && i >= 0; i--) {
+        container.removeChild(cards[i]);
+    }
+}
+
+// Events anzeigen mit Like-Icon
+function renderEvents(events) {
+    const container = document.getElementById("events");
+    if (!container) return;
+
+    if (events.length === 0 && currentPage === 0) {
+        container.innerHTML = "<p>Keine Events in Österreich gefunden.</p>";
+        return;
+    }
+
+    events.forEach(event => {
+        const rawType = event.classifications?.[0]?.segment?.name || "Undefined";
+        const translatedType = categoryTranslations[rawType] || rawType;
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+            <div class="card-content">
+                <span class="card-title">${event.name}</span>
+                <p>${event.dates.start.localDate} – ${event._embedded?.venues?.[0]?.name || "Veranstaltungsort siehe 'Mehr Infos'"}</p>
+                <p><em>Kategorie: ${translatedType}</em></p>
+                <a href="${event.url}" target="_blank">Mehr Infos</a>
                 <button class="btn-flat like-btn" data-event-id="${event.id}" style="min-width:40px;">
-                    <i class="material-icons">
-                        ${isEventInFavorites(event.id) ? "favorite" : "favorite_border"}
-                    </i>
+                    <i class="material-icons">favorite_border</i>
                 </button>
             </div>
         `;
         container.appendChild(card);
 
+        // Like-Button vorbereiten
         const likeBtn = card.querySelector(".like-btn");
-        likeBtn.addEventListener("click", () => toggleFavorite(event, likeBtn));
+        if (likeBtn) {
+            const isFavorited = isEventInFavorites(event.id);
+            const icon = likeBtn.querySelector("i");
+            icon.textContent = isFavorited ? "favorite" : "favorite_border";
+
+            likeBtn.addEventListener("click", () => {
+                toggleFavorite(event, likeBtn);
+            });
+        }
     });
 }
 
-// -------------------- Favoriten-Logik --------------------
+// Favoritenprüfung
 function isEventInFavorites(eventId) {
-    const favs = JSON.parse(localStorage.getItem("favorites")) || [];
-    return favs.some(f => f.id === eventId);
+    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    return favorites.some(fav => fav.id === eventId);
 }
 
-function toggleFavorite(event, btn) {
-    let favs = JSON.parse(localStorage.getItem("favorites")) || [];
-    const idx = favs.findIndex(f => f.id === event.id);
-    const icon = btn.querySelector("i");
+// Favorit hinzufügen oder entfernen
+function toggleFavorite(event, buttonElement) {
+    let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    const index = favorites.findIndex(fav => fav.id === event.id);
+    const icon = buttonElement.querySelector("i");
 
-    if (idx === -1) {
-        favs.push(event);
+    if (index === -1) {
+        favorites.push(event);
         icon.textContent = "favorite";
     } else {
-        favs.splice(idx, 1);
+        favorites.splice(index, 1);
         icon.textContent = "favorite_border";
     }
-    localStorage.setItem("favorites", JSON.stringify(favs));
+
+    localStorage.setItem("favorites", JSON.stringify(favorites));
 }
 
-// -------------------- Aufräumfunktionen --------------------
-function clearEvents() {
-    document.getElementById("events").innerHTML = "";
-}
-
-function removeLastEvents() {
-    const cards = document.querySelectorAll("#events .card");
-    for (let i = cards.length - 1; i >= cards.length - 20 && i >= 0; i--) {
-        cards[i].remove();
-    }
-}
-
-// -------------------- Filterfunktion über alle geladenen Events --------------------
-function applyFilters() {
-    const selCat     = document.getElementById("categoryFilter").value.toLowerCase();
-    const selMon     = document.getElementById("monthFilter").value;
-    const selCity    = document.getElementById("locationFilter").value.toLowerCase();
-    const feedbackEl = document.getElementById("filterFeedback");
-
-    // Filter auf das komplette allEvents-Array anwenden
-    const filtered = allEvents.filter(event => {
-        const rawType    = event.classifications?.[0]?.segment?.name || "Undefined";
-        const type       = categoryTranslations[rawType] || rawType;
-        const date       = event.dates.start.localDate;
-        const venue      = event._embedded?.venues?.[0] || {};
-        const engCity    = (venue.city?.name || "").toLowerCase();
-        const city       = cityMap[engCity] || engCity;
-
-        const okCat  = !selCat   || type.toLowerCase().includes(selCat);
-        const okMon  = !selMon   || date.startsWith(selMon);
-        const okCity = !selCity  || city.includes(selCity);
-
-        return okCat && okMon && okCity;
-    });
-
-    // Alle gefilterten anzeigen
-    renderEvents(filtered);
-
-    // Pagination-Buttons verstecken
-    document.getElementById("loadMoreBtn").style.display = "none";
-    document.getElementById("loadLessBtn").style.display = "none";
-
-    // Feedback
-    if (feedbackEl) {
-        feedbackEl.textContent = `Gefiltert: ${filtered.length} Event(s) gefunden`;
-    }
-}
