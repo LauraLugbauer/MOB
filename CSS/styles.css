@@ -9,4 +9,141 @@
     transform: scale(1.2);
 }
 
+/* --------------------------------------
+   HERO
+-------------------------------------- */
+.hero {
+    padding: 120px 0;
+    /* Optional: Bild statt Uni-Farbe
+    background: url('../IMGs/hero-bg.jpg') no-repeat center center;
+    background-size: cover;
+    */
+}
+
+.hero-title {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+/* Abstände zwischen den Buttons */
+.btn-group .btn-large {
+    margin: 0 0.5rem;
+    border-radius: 30px;
+    min-width: 180px;
+}
+
+/* Footer-Padding reduzieren */
+.page-footer {
+    padding: 10px 0;
+}
+
+
+/* --------------------------------------------------
+   Events-Seite: Cards
+-------------------------------------------------- */
+.event-card {
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.event-card .card-content {
+    padding: 1.5rem 1.5rem 0.75rem;
+}
+
+.event-card .card-title {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.event-date {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 0.5rem;
+}
+
+.event-category {
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    color: #00796b;
+}
+
+/* Link-Stil für „Mehr Infos“ */
+.event-card .card-content a {
+    font-weight: 500;
+}
+
+/* --------------------------------------------------
+   Card Actions: Maps-Link & Herz
+-------------------------------------------------- */
+.event-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1.5rem 1rem;
+    background: #fafafa;
+}
+
+.google-maps-link {
+    color: #ef6c00;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+/* Herz-Icon */
+.favorite-icon {
+    font-size: 1.6rem;
+    color: #e53935;
+    transition: transform 0.2s;
+}
+.like-btn:hover .favorite-icon {
+    transform: scale(1.2);
+}
+
+/* --------------------------------------------------
+   Filter-Bar oben
+-------------------------------------------------- */
+.filter-bar {
+    padding: 1rem 0;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 1.5rem;
+}
+
+/* Etwas mehr Platz zwischen Filter‐Elementen */
+.filter-bar .col {
+    margin-bottom: 0.75rem;
+}
+
+/* Buttons in der Filter-Bar etwas größer */
+.filter-bar .btn {
+    min-width: 120px;
+}
+
+/* Feedback-Text */
+#filterFeedback {
+    font-style: italic;
+    color: #333;
+    margin: 0 0 1rem;
+}
+
+/* --------------------------------------------------
+   Overall adjustments
+-------------------------------------------------- */
+body {
+    background-color: #e0f2f1;
+}
+
+.page-footer {
+    padding: 0.75rem 0;
+    font-size: 0.85rem;
+}
+
 

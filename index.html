@@ -1,46 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <title>Evently</title>
     <link rel="manifest" href="manifest.webmanifest">
+
+    <!-- Materialize CSS -->
     <link rel="stylesheet" href="CSS/materialize.min.css">
+    <!-- Deine eigenen Styles -->
     <link rel="stylesheet" href="CSS/styles.css">
 </head>
-<body class="teal lighten-5">
+<body>
 
-<div class="container">
-    <div class="row">
-        <div class="col s12 m6 offset-m3 center-align">
-            <h1>Evently</h1>
-            <p>Your personal event organizer</p>
-            <a href="events.html" class="waves-effect waves-light btn-large teal darken-2">
-                Events suchen
-            </a>
-            <!-- Favoriten-Button darunter -->
-            <a href="favorites.html" class="waves-effect waves-light btn-large grey darken-1" style="margin-left:1rem;">
-                <i class="material-icons left">zu den Favoriten</i>
-            </a>
-
-            <a href="roulett.html" class="btn-large pink darken-2 white-text">
-                🎲 Event Roulette starten
-            </a>
-
+<!-- HERO SECTION -->
+<section class="hero teal darken-2">
+    <div class="container center-align">
+        <h1 class="hero-title white-text">Evently</h1>
+        <p class="hero-subtitle grey-lighten-4">Finde passende Events in ganz Österreich</p>
+        <div class="btn-group">
+            <a href="events.html" class="btn-large waves-effect waves-light teal lighten-1">Events suchen</a>
+            <a href="favorites.html" class="btn-large waves-effect waves-light grey darken-1">Zu den Favoriten</a>
+            <a href="roulett.html" class="btn-large pink darken-2 white-text">🎲 Event Roulette starten</a>
         </div>
     </div>
-</div>
+</section>
 
-    <footer class="page-footer teal darken-2">
-        <div class="container">
-            <div class="row">
-                <div class="col s12 center-align">
-                    © 2023 Evently
-                </div>
-            </div>
-        </div>
-    </footer>
+<!-- FOOTER -->
+<footer class="page-footer teal darken-3">
+    <div class="container center-align white-text">
+        © 2025 Evently
+    </div>
+</footer>
 
+<!-- Materialize JS (für z. B. Selects) -->
 <script src="JS/materialize.min.js"></script>
+<!-- Deine App-Logik -->
 <script src="JS/app.js"></script>
 </body>
 </html>
