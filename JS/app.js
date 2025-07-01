@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // -------------------- API-Aufruf --------------------
 async function fetchEvents(keyword = "", page = 0) {
     const API_KEY = "Ogln6rgdScGA7v55rV1GL5gDH3f3pLw9";
-    // Wir laden jetzt 100 auf einen Schlag, um genug Daten zum Filtern & Paginating zu haben
+    // Wir laden jetzt 200 auf einen Schlag, um genug Daten zum Filtern & Paginating zu haben
     let url = `https://app.ticketmaster.com/discovery/v2/events.json`
         + `?apikey=${API_KEY}&countryCode=AT&size=200&page=${page}`;
     if (keyword) {
@@ -140,7 +140,7 @@ async function fetchEvents(keyword = "", page = 0) {
 function renderEvents(events) {
     const container = document.getElementById("events");
     if (!container) return;
-    container.innerHTML = "";  // jedes Mal sauber leeren
+    container.innerHTML = "";
 
     if (events.length === 0) {
         container.innerHTML = "<p>Keine Events gefunden.</p>";
@@ -256,3 +256,58 @@ function applyFilters() {
         feedbackEl.textContent = `Gefiltert: ${filtered.length} Event(s) gefunden`;
     }
 }
+
+// -------------------- Favoriten-Ansicht rendern --------------------
+function renderFavorites() {
+    const container = document.getElementById("favorites");
+    if (!container) return;
+    container.innerHTML = "";
+
+    const favs = JSON.parse(localStorage.getItem("favorites")) || [];
+    if (favs.length === 0) {
+        container.innerHTML = "<p>Du hast noch keine Favoriten.</p>";
+        return;
+    }
+
+    favs.forEach(event => {
+        const rawType    = event.classifications?.[0]?.segment?.name || "Undefined";
+        const translated = categoryTranslations[rawType] || rawType;
+        const rawDate    = event.dates.start.localDate;
+        const formatted  = new Date(rawDate)
+            .toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
+        const venueName  = event._embedded?.venues?.[0]?.name || "Unbekannter Ort";
+
+        // Karte mit Herz-Button
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+            <div class="card-content">
+                <span class="card-title">${event.name}</span>
+                <p>${formatted} – ${venueName}</p>
+                <p><em>Kategorie: ${translated}</em></p>
+                <a href="${event.url}" target="_blank">Mehr Infos</a>
+            </div>
+            <div class="card-action" style="display:flex;justify-content:flex-end;align-items:center;">
+                <button class="btn-flat like-btn" data-event-id="${event.id}" style="min-width:40px;">
+                    <i class="material-icons">favorite</i>
+                </button>
+            </div>
+        `;
+        container.appendChild(card);
+
+        // Herz-Button zum Entfernen aus Favoriten
+        const likeBtn = card.querySelector(".like-btn");
+        likeBtn.addEventListener("click", () => {
+            toggleFavorite(event, likeBtn);
+            renderFavorites();
+        });
+    });
+}
+
+
+// -------------------- Automatischer Aufruf auf der Favorites-Seite --------------------
+document.addEventListener("DOMContentLoaded", () => {
+    if (document.getElementById("favorites")) {
+        renderFavorites();
+    }
+});
