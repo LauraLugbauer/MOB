@@ -1,0 +1,12 @@
+.like-btn i.material-icons {
+    color: #e53935; /* rotes Herz */
+    font-size: 24px;
+    vertical-align: middle;
+    transition: transform 0.2s ease;
+}
+
+.like-btn:hover i.material-icons {
+    transform: scale(1.2);
+}
+
+

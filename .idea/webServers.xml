@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="0d61d789-7745-49a3-8462-eb215eaec60c" name="Evently Server">
+        <fileTransfer rootFolder="/public_html/pwa" accessType="SFTP" host="s2310456013.student.kwmhgb.at" port="222" sshConfigId="8153f784-4865-4513-9c73-c4ff544d27fd" sshConfig="xvvnuv@s2310456013.student.kwmhgb.at:222 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
