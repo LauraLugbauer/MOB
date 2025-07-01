@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Roulette</title>
+    <link rel="stylesheet" href="CSS/materialize.min.css">
+    <link rel="stylesheet" href="CSS/styles.css">
+</head>
+<body class="deep-purple lighten-5">
+<div class="container center-align" style="margin-top: 50px;">
+    <h3>🎲 Event Roulette</h3>
+    <p>Wähle eine Kategorie und lass dich überraschen!</p>
+
+    <div class="input-field" style="max-width: 300px; margin: auto;">
+        <select id="randomCategory">
+            <option value="">Kategorie wählen</option>
+            <option value="Musik">Musik</option>
+            <option value="Sport">Sport</option>
+            <option value="Kunst & Theater">Kunst & Theater</option>
+            <option value="Verschiedenes">Verschiedenes</option>
+        </select>
+        <label>Kategorie</label>
+    </div>
+
+    <button id="spinBtn" class="btn-large purple darken-2 white-text" style="margin-top: 20px;">Lass mich entscheiden!</button>
+
+    <div id="result" style="margin-top: 40px;"></div>
+    <button id="rerollBtn" class="btn purple lighten-1 white-text" style="margin-top: 20px; display: none;">Zeig mir ein anderes!</button>
+
+
+    <a href="index.html" class="btn-flat">← Zurück</a>
+</div>
+
+<script src="JS/roulett.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        M.AutoInit();
+    });
+</script>
+</body>
+</html>
