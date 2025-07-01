@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
 async function fetchEvents(keyword = "", page = 0) {
     const API_KEY = "Ogln6rgdScGA7v55rV1GL5gDH3f3pLw9";
     let url = `https://app.ticketmaster.com/discovery/v2/events.json`
-        + `?apikey=${API_KEY}&countryCode=AT&size=20&page=${page}`;
+        + `?apikey=${API_KEY}&countryCode=AT&size=30&page=${page}`;
     if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
 
     try {
@@ -254,7 +254,7 @@ function applyFilters() {
 
     // Feedback
     if (feedbackEl) {
-        feedbackEl.textContent = `Gefiltert: ${visibleCount} von ${allCards.length} Events.`;
+        feedbackEl.textContent = `Gefiltert: ${visibleCount} Event(s) gefunden`;
     }
 }
 
