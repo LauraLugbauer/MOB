@@ -14,6 +14,10 @@
     text-align: left;
 }
 
+.no-left-align {
+    text-align: right;
+}
+
 /* --------------------------------------
    HERO
 -------------------------------------- */
@@ -35,7 +39,6 @@
 
 h2 {
     color: #4a148c;
-    font-style: italic;
 }
 
 input::placeholder {
@@ -155,4 +158,9 @@ body {
 
 .btn-large{
     margin: 10px;
+}
+
+.btn-large, .btn {
+    transition: all 0.3s ease;
+    border-radius: 30px;
 }
