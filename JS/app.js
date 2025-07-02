@@ -170,7 +170,7 @@ function renderEvents(events) {
                 <span class="card-title">${event.name}</span>
                 <p>${formatted} – ${venue.name || "Veranstaltungsort siehe 'Mehr Infos'"}</p>
                 <p><em>Kategorie: ${translated}</em></p>
-                <a href="${event.url}" target="_blank">Mehr Infos</a>
+                <a href="${event.url}" target="_blank" style="color: purple">Mehr Infos</a>
             </div>
             <div class="card-action" style="display:flex;justify-content:space-between;align-items:center;">
                 <a href="${mapsUrl}" target="_blank">In Google Maps anzeigen</a>

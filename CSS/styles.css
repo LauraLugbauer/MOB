@@ -1,5 +1,5 @@
 .like-btn i.material-icons {
-    color: #e53935; /* rotes Herz */
+    color: #FD7251;
     font-size: 24px;
     vertical-align: middle;
     transition: transform 0.2s ease;
@@ -9,9 +9,13 @@
     transform: scale(1.2);
 }
 
-/* --------------------------------------
-   HERO
--------------------------------------- */
+.align-left {
+    text-align: left;
+}
+
+      /* --------------------------------------
+         HERO
+      -------------------------------------- */
 .hero {
     padding: 120px 0;
     /* Optional: Bild statt Uni-Farbe
@@ -42,6 +46,17 @@
 .page-footer {
     padding: 10px 0;
 }
+
+h2{
+    color: #4a148c
+;
+    font-style: italic;
+}
+
+
+ input::placeholder {
+     color: darkgray;
+ }
 
 
 /* --------------------------------------------------
@@ -79,6 +94,16 @@
 .event-card .card-content a {
     font-weight: 500;
 }
+
+.hero-subtitle {
+    margin-top: -100px;
+}
+
+.btn-group {
+    margin-top: 150px;
+}
+
+
 
 /* --------------------------------------------------
    Card Actions: Maps-Link & Herz
@@ -145,5 +170,6 @@ body {
     padding: 0.75rem 0;
     font-size: 0.85rem;
 }
+
 
 
