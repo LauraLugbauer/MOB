@@ -41,7 +41,7 @@ function renderFavorites() {
                 <span class="card-title">${event.name}</span>
                 <p>${event.dates.start.localDate} – ${event._embedded?.venues?.[0]?.name || "Veranstaltungsort siehe 'Mehr Infos'"}</p>
                 <p><em>Kategorie: ${event.classifications?.[0]?.segment?.name || "Keine Angabe"}</em></p>
-                <a href="${event.url}" target="_blank">Mehr Infos</a>
+                <a href="${event.url}" target="_blank" style="color: rebeccapurple;">Mehr Infos</a>
             </div>
         `;
         container.appendChild(card);

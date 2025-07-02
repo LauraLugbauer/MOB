@@ -5,7 +5,8 @@
     transition: transform 0.2s ease;
 }
 
-.like-btn:hover i.material-icons {
+.like-btn:hover i.material-icons,
+.like-btn:hover .favorite-icon {
     transform: scale(1.2);
 }
 
@@ -13,15 +14,11 @@
     text-align: left;
 }
 
-      /* --------------------------------------
-         HERO
-      -------------------------------------- */
+/* --------------------------------------
+   HERO
+-------------------------------------- */
 .hero {
     padding: 120px 0;
-    /* Optional: Bild statt Uni-Farbe
-    background: url('../IMGs/hero-bg.jpg') no-repeat center center;
-    background-size: cover;
-    */
 }
 
 .hero-title {
@@ -33,31 +30,17 @@
     font-size: 1.25rem;
     margin-bottom: 2rem;
     opacity: 0.9;
+    margin-top: -100px; /* Merged duplicate rule */
 }
 
-/* Abstände zwischen den Buttons */
-.btn-group .btn-large {
-    margin: 0 0.5rem;
-    border-radius: 30px;
-    min-width: 180px;
-}
-
-/* Footer-Padding reduzieren */
-.page-footer {
-    padding: 10px 0;
-}
-
-h2{
-    color: #4a148c
-;
+h2 {
+    color: #4a148c;
     font-style: italic;
 }
 
-
- input::placeholder {
-     color: darkgray;
- }
-
+input::placeholder {
+    color: darkgray;
+}
 
 /* --------------------------------------------------
    Events-Seite: Cards
@@ -95,15 +78,9 @@ h2{
     font-weight: 500;
 }
 
-.hero-subtitle {
-    margin-top: -100px;
-}
-
 .btn-group {
     margin-top: 150px;
 }
-
-
 
 /* --------------------------------------------------
    Card Actions: Maps-Link & Herz
@@ -129,9 +106,6 @@ h2{
     color: #e53935;
     transition: transform 0.2s;
 }
-.like-btn:hover .favorite-icon {
-    transform: scale(1.2);
-}
 
 /* --------------------------------------------------
    Filter-Bar oben
@@ -150,6 +124,7 @@ h2{
 /* Buttons in der Filter-Bar etwas größer */
 .filter-bar .btn {
     min-width: 120px;
+    border-radius: 30px; /* Abgerundete Ecken für Filter-Bar Buttons */
 }
 
 /* Feedback-Text */
@@ -171,5 +146,13 @@ body {
     font-size: 0.85rem;
 }
 
+/* --------------------------------------
+   Allgemeine Buttons
+-------------------------------------- */
+.btn, .btn-group .btn-large, .filter-bar .btn, .event-card .btn, .event-actions .btn {
+    border-radius: 30px; /* Rundliche Ecken für alle Buttons */
+}
 
-
+.btn-large{
+    margin: 10px;
+}
