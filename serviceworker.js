@@ -4,62 +4,88 @@ const CACHED_URLS = [
     "IMGs/Icons/icon-144v2.png",
     "JS/app.js",
     "index.html",
-    "manifest.webmanifest",
+    "/manifest.webmanifest",
+    "CSS/roulette.css",
+    "JS/roulett.js",
+    "CSS/materialize.min.css",
+    "JS/materialize.min.js",
+    "JS/like.js",
+    "events.html",
+    "favorites.html",
+    "roulett.html",
 ];
 
-self.addEventListener("install", function(event) {
-    console.log("Service Worker installing.");
-    event.waitUntil(
-        caches.open(CACHE_NAME).then(function(c) {
-            return c.addAll(CACHED_URLS);
-        }).catch((err)=>{
-            console.error(err);
-        })
-    );
-})
-
-// Network first, falling back to cache strategy
-self.addEventListener("fetch", function(event) {
-    event.respondWith(
-        fetch(event.request).catch(function() {
-            return caches.match(event.request).then(function(response) {
-                return response;
-            });
-        })
+// 1) Installation: static assets vorab cachen
+self.addEventListener("install", evt => {
+    evt.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => cache.addAll(CACHED_URLS))
+            .then(() => self.skipWaiting())
     );
 });
 
-self.addEventListener("activate",(event)=>{
-    event.waitUntil(
-        caches.keys().then((cacheNames)=>{
-            return Promise.all(
-                cacheNames.map((cacheName)=>{
-                    if(CACHE_NAME !== cacheName && cacheName.startsWith("evently-cache-")) {
-                        console.log("Deleting old cache:", cacheName);
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        })
+// 2) Aktivierung: alte Caches aufräumen
+self.addEventListener("activate", evt => {
+    evt.waitUntil(
+        caches.keys().then(keys =>
+            Promise.all(
+                keys
+                    .filter(key => key !== CACHE_NAME) // Nur alte Caches löschen
+                    .map(key => caches.delete(key))
+            )
+        ).then(() => self.clients.claim())
     );
 });
 
-self.addEventListener('fetch', event => {
-    const url = new URL(event.request.url);
+// 3) Fetch:
+//    • Wenn navigation (Seitenaufruf), network-first + fallback auf index.html
+//    • Für alle anderen Resource-Anfragen: cache-first
+self.addEventListener("fetch", evt => {
+    const req = evt.request;
+    const url = new URL(req.url);
 
-    // Nur Ticketmaster-Requests abfangen
-    if (url.origin === 'https://app.ticketmaster.com') {
-        event.respondWith((async () => {
+    // a) Navigation (HTML-Seiten) → Network-First, Fallback auf index.html
+    if (req.mode === "navigate") {
+        evt.respondWith(
+            fetch(req).catch(() => caches.match("index.html"))
+        );
+        return;
+    }
+
+    // b) Ticketmaster-API → Stale-While-Revalidate in dynamic-events Cache
+    if (url.origin === "https://app.ticketmaster.com") {
+        evt.respondWith((async () => {
+            const cache = await caches.open(DYNAMIC_CACHE);
+
+            // 1. Versuche den Cache
+            const cached = await cache.match(req);
+            if (cached) {
+                // im Hintergrund frische Version holen
+                fetch(req).then(networkRes => {
+                    cache.put(req, networkRes.clone());
+                });
+                return cached;
+            }
+
+            // 2. Sonst Netzwerk und cachen
             try {
-                const networkRes = await fetch(event.request);
-                const cache = await caches.open('dynamic-events');
-                cache.put(event.request, networkRes.clone());
+                const networkRes = await fetch(req);
+                cache.put(req, networkRes.clone());
                 return networkRes;
             } catch {
-                return caches.match(event.request);
+                // 3. Fallback: leere JSON-Antwort
+                return new Response(JSON.stringify({ _embedded:{ events:[] } }), {
+                    headers: { "Content-Type": "application/json" }
+                });
             }
         })());
         return;
     }
-});
 
+    // c) Alle anderen Ressourcen → Cache-First, dann Netzwerk
+    evt.respondWith(
+        caches.match(req).then(cached =>
+            cached || fetch(req)
+        )
+    );
+});
