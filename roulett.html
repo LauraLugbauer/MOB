@@ -4,24 +4,25 @@
     <meta charset="UTF-8">
     <title>Event Roulette</title>
     <link rel="stylesheet" href="CSS/materialize.min.css">
-    <link rel="stylesheet" href="CSS/styles.css">
+    <link rel="stylesheet" href="CSS/roulette.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
 </head>
 <body class="deep-purple lighten-5">
-<div class="container center-align" style="margin-top: 50px;">
+<div class="container center-align" style="margin-top:50px;">
     <div class="align-left">
-        <a href="index.html" class="purple-text text-darken-4 ">
+        <a href="index.html" class="purple-text text-darken-4">
             <i class="material-icons left">arrow_back</i>Zurück zum Hauptmenü
         </a>
     </div>
 
     <h2>Event Roulette</h2>
-    <p class="hero-subtitle black-text" style="font-style: italic; padding-top: 100px; padding-bottom: 80px">Wähle eine Kategorie und lass dich überraschen!</p>
+    <p class="hero-subtitle black-text" style="font-style:italic; padding:40px 0;">
+        Wähle eine Kategorie und lass dich überraschen!
+    </p>
 
-    <div class="input-field" style="max-width: 300px; margin: auto;">
+    <div class="input-field" style="max-width:300px; margin:auto;">
         <select id="randomCategory">
-            <option value="">Kategorie wählen</option>
+            <option value="" disabled selected>Kategorie wählen</option>
             <option value="Musik">Musik</option>
             <option value="Sport">Sport</option>
             <option value="Kunst & Theater">Kunst & Theater</option>
@@ -30,20 +31,23 @@
         <label>Kategorie</label>
     </div>
 
-    <button id="spinBtn" class="btn-large purple darken-4 white-text" style="margin-top: 20px; padding-bottom: 50px">Lass mich entscheiden!</button>
+    <button id="spinBtn" class="btn-large purple darken-4 white-text" style="margin-top:20px;">
+        Lass mich entscheiden!
+    </button>
 
-    <div id="result" style="margin-top: 40px;"></div>
-    <button id="rerollBtn" class="btn purple darken-4 white-text" style="margin-top: 20px; display: none;">Zeig mir ein anderes!</button>
-
-
+    <div id="result" style="margin-top:40px;"></div>
+    <button id="rerollBtn" class="btn purple darken-4 white-text" style="margin-top:20px; display:none;">
+        Zeig mir ein anderes!
+    </button>
 </div>
 
-<script src="JS/roulett.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<!-- Materialize und dein Script -->
+<script src="JS/materialize.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        M.AutoInit();
+    document.addEventListener("DOMContentLoaded", () => {
+        M.FormSelect.init(document.querySelectorAll("select"));
     });
 </script>
+<script src="JS/roulett.js"></script>
 </body>
 </html>

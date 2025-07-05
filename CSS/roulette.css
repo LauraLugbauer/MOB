@@ -1,0 +1,160 @@
+/* CSS/roulette.css */
+
+/* 1. Body mit lila Gradient */
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #ede7f6, #d1c4e9);
+    font-family: sans-serif;
+}
+
+/* 2. Zentraler Container */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* 3. Zurück-Link */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    color: #6a1b9a;
+    text-decoration: none;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+}
+.back-link i {
+    margin-right: 0.5rem;
+    font-size: 1.4rem;
+}
+
+/* 4. Überschrift & Untertitel */
+h2 {
+    color: #6a1b9a;
+    font-size: 2.5rem;
+    font-weight: 300;
+    margin-bottom: 1rem;
+}
+.hero-subtitle {
+    font-style: italic;
+    color: #4e342e;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+/* 5. Materialize-Select Overrides */
+.input-field label {
+    color: #6a1b9a !important;
+}
+.input-field .select-dropdown {
+    border-bottom: 1px solid #6a1b9a !important;
+    color: #212121 !important;
+}
+
+/* 6. Haupt-Button „Lass mich entscheiden!“ */
+#spinBtn {
+    display: block;
+    margin: 2rem auto 0;
+    padding: 0 2rem;
+    height: 3.8rem;
+    line-height: 3.8rem;
+    background: linear-gradient(90deg, #8e24aa, #e040fb) !important;
+    color: #fff !important;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    text-transform: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+}
+/* Hover-Effekt beibehalten */
+#spinBtn:hover {
+    transform: scale(1.05);
+}
+
+/* Spinner-Animation */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+button.loading {
+    color: transparent !important;
+    position: relative;
+}
+button.loading::after {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 1rem; height: 1rem;
+    margin: -0.5rem 0 0 -0.5rem;
+    border: 2px solid #fff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+/* 7. Reroll-Button */
+#rerollBtn {
+    display: none;
+    margin: 1.5rem auto 0;
+    padding: 0 1.5rem;
+    height: 3rem;
+    line-height: 3rem;
+    background: linear-gradient(90deg, #ab47bc, #ce93d8) !important;
+    color: #fff !important;
+    border: none;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+/* Auch hier Hover-Effekt */
+#rerollBtn:hover {
+    transform: scale(1.05);
+}
+
+/* 8. Ergebnis-Card mit einfachem Look */
+#result .card {
+    margin-top: 2rem;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+#result .card-content {
+    padding: 1.5rem;
+}
+#result .card-title {
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+    color: #6a1b9a;
+}
+#result .card-content p {
+    margin: 0.25rem 0;
+    color: #424242;
+    font-size: 0.95rem;
+}
+#result .card-content em {
+    font-style: normal;
+    font-weight: 500;
+}
+
+/* 9. Card-Aktion rechts ausrichten */
+#result .card-action {
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #eee;
+}
+#result .card-action a {
+    color: #ff7043;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* 10. Ergebnis-Container zentrieren */
+#result {
+    text-align: center;
+}
