@@ -44,7 +44,7 @@ self.addEventListener("fetch", evt => {
     const req = evt.request;
     const url = new URL(req.url);
 
-    // a) Navigation (HTML-Seiten) → Network-First, Fallback auf index.html
+    // a) PWA-Shell beim direkten Aufruf einer HTML-Seite
     if (req.mode === "navigate") {
         evt.respondWith(
             fetch(req).catch(() => caches.match("index.html"))
@@ -52,37 +52,7 @@ self.addEventListener("fetch", evt => {
         return;
     }
 
-    // b) Ticketmaster-API → Stale-While-Revalidate in dynamic-events Cache
-    if (url.origin === "https://app.ticketmaster.com") {
-        evt.respondWith((async () => {
-            const cache = await caches.open(DYNAMIC_CACHE);
-
-            // 1. Versuche den Cache
-            const cached = await cache.match(req);
-            if (cached) {
-                // im Hintergrund frische Version holen
-                fetch(req).then(networkRes => {
-                    cache.put(req, networkRes.clone());
-                });
-                return cached;
-            }
-
-            // 2. Sonst Netzwerk und cachen
-            try {
-                const networkRes = await fetch(req);
-                cache.put(req, networkRes.clone());
-                return networkRes;
-            } catch {
-                // 3. Fallback: leere JSON-Antwort
-                return new Response(JSON.stringify({ _embedded:{ events:[] } }), {
-                    headers: { "Content-Type": "application/json" }
-                });
-            }
-        })());
-        return;
-    }
-
-    // c) Alle anderen Ressourcen → Cache-First, dann Netzwerk
+    // b) Alle anderen statischen Assets via cache-first
     evt.respondWith(
         caches.match(req).then(cached =>
             cached || fetch(req)

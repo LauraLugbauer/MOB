@@ -1,17 +1,6 @@
 // JS/app.js
 
-// -------------------- Helferfunktion für Google-Maps-Link --------------------
-window.buildMapsUrl = async function(venue) {
-    if (venue.location?.latitude && venue.location?.longitude) {
-        return `https://www.google.com/maps/search/?api=1&query=${venue.location.latitude},${venue.location.longitude}`;
-    }
-    const address = encodeURIComponent(
-        [venue.name, venue.city?.name]
-            .filter(Boolean)
-            .join(', ')
-    );
-    return `https://www.google.com/maps/search/?api=1&query=${address}`;
-};
+
 
 // -------------------- App-State --------------------
 let displayLimit   = 20;   // Wie viele Events wir standardmäßig anzeigen
