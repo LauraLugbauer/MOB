@@ -1,5 +1,11 @@
 // JS/roulett.js
 
+// M.FormSelect initialisieren
+document.addEventListener("DOMContentLoaded", () => {
+    if (window.M && M.FormSelect) {
+        M.FormSelect.init(document.querySelectorAll("select"));
+    }
+});
 // Übersetzung englischer Kategorien → Deutsch
 const categoryTranslations = {
     "Music":          "Musik",
