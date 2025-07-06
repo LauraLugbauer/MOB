@@ -4,7 +4,7 @@
 body {
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, #ede7f6, #d1c4e9);
+    background-color: #543189;
     font-family: sans-serif;
 }
 
@@ -15,15 +15,18 @@ body {
     padding: 2rem 1rem;
 }
 
-/* 3. Zurück-Link */
+.align-left {
+    text-align: left;
+}
+
 .back-link {
     display: inline-flex;
-    align-items: center;
     color: #6a1b9a;
     text-decoration: none;
     font-weight: 500;
     margin-bottom: 1.5rem;
 }
+
 .back-link i {
     margin-right: 0.5rem;
     font-size: 1.4rem;
