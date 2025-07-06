@@ -9,14 +9,11 @@
 
     <!-- Material Icons (für Herz und Rück-Icon) -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- Materialize CSS -->
     <link rel="stylesheet" href="CSS/materialize.min.css">
-    <!-- Eigene Styles -->
     <link rel="stylesheet" href="CSS/styles.css">
 
     <link rel="manifest" href="manifest.webmanifest">
 
-    <!-- App-Feeling auf Mobilgeräten -->
     <meta name="theme-color" content="#543189">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -29,7 +26,6 @@
 
 <div class="container">
 
-    <!-- Obere Zeile: Zurück + Favoriten -->
     <div class="row filter-bar valign-wrapper" style="margin-bottom:1rem;">
         <div class="align-left">
             <a href="index.html" class="purple-text text-darken-4">
@@ -38,7 +34,7 @@
         </div>
         <div class="col s6 right-align">
             <a href="favorites.html" class="btn pink darken-2 white-text">
-                <i class="material-icons left">favorite</i>Meine Favoriten
+                <i class="material-icons left">favorite</i>Favoriten
             </a>
         </div>
     </div>
@@ -112,7 +108,7 @@
     <!-- Event-Liste -->
     <div id="events"></div>
 
-    <!-- Paginierung -->
+
     <div class="center-align" style="margin:20px 0;">
         <button id="loadMoreBtn" class="btn purple darken-4 white-text" style="margin-right:1rem;">
             Mehr laden
@@ -124,9 +120,7 @@
 
 </div>
 
-<!-- Materialize JS (für Selects) -->
 <script src="JS/materialize.min.js"></script>
-<!-- Deine App-Logik -->
 <script src="JS/maps.js"></script>
 <script src="JS/app.js"></script>
 </body>

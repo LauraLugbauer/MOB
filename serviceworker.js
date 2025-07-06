@@ -18,7 +18,7 @@ const CACHED_URLS = [
     "https://fonts.gstatic.com/s/materialicons/v143/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2",
 ];
 
-// 1) Installation: Assets vorab in den Cache legen
+//Installation: Cache die benötigten Dateien
 self.addEventListener("install", function(event) {
     console.log("Service Worker installing...");
     event.waitUntil(
@@ -28,7 +28,7 @@ self.addEventListener("install", function(event) {
     );
 });
 
-// 2) Aktivierung: Alte Caches löschen
+// Aktivierung: Alte Caches löschen
 self.addEventListener("activate", function(event) {
     console.log("Service Worker activating...");
     event.waitUntil(
@@ -45,7 +45,7 @@ self.addEventListener("activate", function(event) {
     );
 });
 
-// 3) Fetch-Handler: Network First, Fallback auf Cache
+//Fetch-Handler: Network First, Fallback auf Cache
 self.addEventListener("fetch", function(event) {
     event.respondWith(
         fetch(event.request).catch(() => {

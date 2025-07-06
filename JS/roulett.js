@@ -1,11 +1,10 @@
-// JS/roulett.js
 
-// M.FormSelect initialisieren
 document.addEventListener("DOMContentLoaded", () => {
     if (window.M && M.FormSelect) {
         M.FormSelect.init(document.querySelectorAll("select"));
     }
 });
+
 // Übersetzung englischer Kategorien → Deutsch
 const categoryTranslations = {
     "Music":          "Musik",
@@ -32,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const rerollBtn = document.getElementById("rerollBtn");
     const resultDiv = document.getElementById("result");
 
-    // Klick auf „Lass mich entscheiden!“
+
     spinBtn.addEventListener("click", async () => {
         // Kategorie global setzen
         selectedCategory = document
@@ -79,12 +78,12 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // erstem Treffer anzeigen und „Nochmal!“-Button einblenden
+        // ersten Treffer anzeigen
         showRandomEvent();
         rerollBtn.style.display = "inline-block";
     });
 
-    // Klick auf „Zeig mir ein anderes!“
+
     rerollBtn.addEventListener("click", () => {
         if (filteredEvents.length > 0) {
             showRandomEvent();
@@ -120,13 +119,11 @@ document.addEventListener("DOMContentLoaded", () => {
       <a href="${moreUrl}" target="_blank" class="purple-text">Mehr Infos</a>
     </div>
     <div class="card-action right-align">
-      <!-- Hier könntest du bei Bedarf den Like-Button wieder hinzufügen -->
     </div>
   `;
 
         resultDiv.appendChild(card);
 
-        // „Zeig mir ein anderes!“-Button wieder einblenden
         rerollBtn.style.display = "inline-block";
     }
 });

@@ -1,6 +1,4 @@
-/* CSS/roulette.css */
 
-/* 1. Body mit lila Gradient */
 body {
     margin: 0;
     padding: 0;
@@ -32,7 +30,7 @@ body {
     font-size: 1.4rem;
 }
 
-/* 4. Überschrift & Untertitel */
+/* Überschrift & Untertitel */
 h2 {
     color: #6a1b9a;
     font-size: 2.5rem;
@@ -46,7 +44,7 @@ h2 {
     font-size: 1.1rem;
 }
 
-/* 5. Materialize-Select Overrides */
+
 .input-field label {
     color: #6a1b9a !important;
 }
@@ -55,7 +53,7 @@ h2 {
     color: #212121 !important;
 }
 
-/* 6. Haupt-Button „Lass mich entscheiden!“ */
+
 #spinBtn {
     display: block;
     margin: 2rem auto 0;
@@ -73,12 +71,12 @@ h2 {
     overflow: hidden;
     transition: transform 0.2s ease;
 }
-/* Hover-Effekt beibehalten */
+
 #spinBtn:hover {
     transform: scale(1.05);
 }
 
-/* Spinner-Animation */
+
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
@@ -98,7 +96,7 @@ button.loading::after {
     animation: spin 0.6s linear infinite;
 }
 
-/* 7. Reroll-Button */
+
 #rerollBtn {
     display: none;
     margin: 1.5rem auto 0;
@@ -113,12 +111,12 @@ button.loading::after {
     cursor: pointer;
     transition: transform 0.2s ease;
 }
-/* Auch hier Hover-Effekt */
+
 #rerollBtn:hover {
     transform: scale(1.05);
 }
 
-/* 8. Ergebnis-Card mit einfachem Look */
+
 #result .card {
     margin-top: 2rem;
     background: #fff;
@@ -144,7 +142,7 @@ button.loading::after {
     font-weight: 500;
 }
 
-/* 9. Card-Aktion rechts ausrichten */
+
 #result .card-action {
     display: flex;
     justify-content: flex-end;
@@ -157,7 +155,7 @@ button.loading::after {
     text-decoration: none;
 }
 
-/* 10. Ergebnis-Container zentrieren */
+
 #result {
     text-align: center;
 }

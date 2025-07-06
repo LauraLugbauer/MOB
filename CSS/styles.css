@@ -82,7 +82,7 @@ input::placeholder {
     color: #00796b;
 }
 
-/* Link-Stil für „Mehr Infos“ */
+
 .event-card .card-content a {
     font-weight: 500;
 }
@@ -91,9 +91,7 @@ input::placeholder {
     margin-top: 150px;
 }
 
-/* --------------------------------------------------
-   Card Actions: Maps-Link & Herz
--------------------------------------------------- */
+
 .event-actions {
     display: flex;
     justify-content: space-between;
@@ -125,27 +123,24 @@ input::placeholder {
     margin-bottom: 1.5rem;
 }
 
-/* Etwas mehr Platz zwischen Filter‐Elementen */
 .filter-bar .col {
     margin-bottom: 0.75rem;
 }
 
-/* Buttons in der Filter-Bar etwas größer */
+
 .filter-bar .btn {
     min-width: 120px;
-    border-radius: 30px; /* Abgerundete Ecken für Filter-Bar Buttons */
+    border-radius: 30px;
 }
 
-/* Feedback-Text */
+
 #filterFeedback {
     font-style: italic;
     color: #333;
     margin: 0 0 1rem;
 }
 
-/* --------------------------------------------------
-   Overall adjustments
--------------------------------------------------- */
+
 body {
     background-color: #e0f2f1;
 }

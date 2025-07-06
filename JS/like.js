@@ -1,4 +1,4 @@
-// like.js
+
 
 // Favoriten speichern oder entfernen
 function toggleFavorite(event, buttonElement) {

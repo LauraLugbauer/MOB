@@ -2,7 +2,7 @@
 
 
 
-// -------------------- App-State --------------------
+
 let displayLimit   = 20;    // Anzahl der standardmäßig angezeigten Events
 let currentKeyword = "";
 let allEvents      = [];    // Puffer aller geladenen Events
@@ -128,7 +128,7 @@ async function renderEvents(events) {
     if (!container) return;
     container.innerHTML = '';
 
-    // Kein Event, prüfen ob offline
+    // Kein Event
     if (events.length === 0) {
             container.innerHTML = '<p>Keine passenden Events gefunden.</p>';
         }
