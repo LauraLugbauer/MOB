@@ -13,49 +13,51 @@ const CACHED_URLS = [
     "events.html",
     "favorites.html",
     "roulett.html",
+    "JS/maps.js",
+    "https://fonts.googleapis.com/icon?family=Material+Icons",
+    "https://fonts.gstatic.com/s/materialicons/v143/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2",
 ];
 
-// 1) Installation: static assets vorab cachen
-self.addEventListener("install", evt => {
-    evt.waitUntil(
+// 1) Installation: Assets vorab in den Cache legen
+self.addEventListener("install", function(event) {
+    console.log("Service Worker installing...");
+    event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => cache.addAll(CACHED_URLS))
-            .then(() => self.skipWaiting())
+            .catch(err => console.error("Fehler beim Caching:", err))
     );
 });
 
-// 2) Aktivierung: alte Caches aufräumen
-self.addEventListener("activate", evt => {
-    evt.waitUntil(
-        caches.keys().then(keys =>
-            Promise.all(
-                keys
-                    .filter(key => key !== CACHE_NAME) // Nur alte Caches löschen
-                    .map(key => caches.delete(key))
-            )
-        ).then(() => self.clients.claim())
+// 2) Aktivierung: Alte Caches löschen
+self.addEventListener("activate", function(event) {
+    console.log("Service Worker activating...");
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cacheName => {
+                    if (cacheName !== CACHE_NAME && cacheName.startsWith("evently-cache")) {
+                        console.log("Lösche alten Cache:", cacheName);
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        })
     );
 });
 
-// 3) Fetch:
-//    • Wenn navigation (Seitenaufruf), network-first + fallback auf index.html
-//    • Für alle anderen Resource-Anfragen: cache-first
-self.addEventListener("fetch", evt => {
-    const req = evt.request;
-    const url = new URL(req.url);
-
-    // a) PWA-Shell beim direkten Aufruf einer HTML-Seite
-    if (req.mode === "navigate") {
-        evt.respondWith(
-            fetch(req).catch(() => caches.match("index.html"))
-        );
-        return;
-    }
-
-    // b) Alle anderen statischen Assets via cache-first
-    evt.respondWith(
-        caches.match(req).then(cached =>
-            cached || fetch(req)
-        )
+// 3) Fetch-Handler: Network First, Fallback auf Cache
+self.addEventListener("fetch", function(event) {
+    event.respondWith(
+        fetch(event.request).catch(() => {
+            return caches.match(event.request).then(response => {
+                if (response) {
+                    return response;
+                }
+                // Fallback für HTML-Seiten
+                if (event.request.mode === "navigate") {
+                    return caches.match("index.html");
+                }
+            });
+        })
     );
 });

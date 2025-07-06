@@ -1,15 +1,6 @@
 // JS/app.js
 
-// -------------------- Helferfunktion für Google-Maps-Link --------------------
-async function buildMapsUrl(venue) {
-    if (venue.location?.latitude && venue.location?.longitude) {
-        return `https://www.google.com/maps/search/?api=1&query=${venue.location.latitude},${venue.location.longitude}`;
-    }
-    const address = encodeURIComponent(
-        [venue.name, venue.city?.name].filter(Boolean).join(', ')
-    );
-    return `https://www.google.com/maps/search/?api=1&query=${address}`;
-}
+
 
 // -------------------- App-State --------------------
 let displayLimit   = 20;    // Anzahl der standardmäßig angezeigten Events
@@ -112,18 +103,23 @@ document.addEventListener('DOMContentLoaded', () => {
 // -------------------- API-Aufruf --------------------
 async function fetchEvents(keyword = '', page = 0) {
     const API_KEY = 'Ogln6rgdScGA7v55rV1GL5gDH3f3pLw9';
-    // wir holen 200 auf einmal, um genug Daten zu haben
-    let url = `https://app.ticketmaster.com/discovery/v2/events.json`
-        + `?apikey=${API_KEY}&countryCode=AT&size=200&page=${page}`;
+    let url = `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${API_KEY}&countryCode=AT&size=200&page=${page}`;
     if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
 
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP-Fehler ${res.status}`);
-    const data   = await res.json();
-    const events = data._embedded?.events || [];
-
-    allEvents = allEvents.concat(events);
-    await renderEvents(allEvents.slice(0, displayLimit));
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP-Fehler ${res.status}`);
+        const data = await res.json();
+        const events = data._embedded?.events || [];
+        allEvents = allEvents.concat(events);
+        await renderEvents(allEvents.slice(0, displayLimit));
+    } catch (err) {
+        console.error('Fehler beim Laden der Events:', err);
+        const container = document.getElementById('events');
+        if (container) {
+            container.innerHTML = `<p style="color:red;">Events können derzeit nicht geladen werden. Prüfe deine Internetverbindung.</p>`;
+        }
+    }
 }
 
 // -------------------- Rendern der Events --------------------
@@ -132,17 +128,19 @@ async function renderEvents(events) {
     if (!container) return;
     container.innerHTML = '';
 
+    // Kein Event, prüfen ob offline
     if (events.length === 0) {
-        container.innerHTML = '<p>Keine Events gefunden.</p>';
-        return;
-    }
+            container.innerHTML = '<p>Keine passenden Events gefunden.</p>';
+        }
+
+
 
     for (const event of events) {
         const rawType    = event.classifications?.[0]?.segment?.name || 'Undefined';
         const translated = categoryTranslations[rawType] || rawType;
         const rawDate    = event.dates.start.localDate;
         const formatted  = new Date(rawDate)
-            .toLocaleDateString('de-DE',{ day:'2-digit', month:'2-digit', year:'numeric' });
+            .toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
         const venue      = event._embedded?.venues?.[0] || {};
         const engCity    = (venue.city?.name || '').toLowerCase();
         const city       = cityMap[engCity] || engCity;
@@ -153,29 +151,31 @@ async function renderEvents(events) {
         card.dataset.category = translated.toLowerCase();
         card.dataset.date     = rawDate;
         card.dataset.city     = city;
+
         card.innerHTML = `
-      <div class="card-content">
-        <span class="card-title">${event.name}</span>
-        <p>${formatted} – ${venue.name || "Veranstaltungsort"}</p>
-        <p><em>Kategorie: ${translated}</em></p>
-        <a href="${event.url}" target="_blank" style="color: purple">Mehr Infos</a>
-      </div>
-      <div class="card-action" style="display:flex;justify-content:space-between;align-items:center;">
-        <a href="${mapsUrl}" target="_blank">In Google Maps anzeigen</a>
-        <button class="btn-flat like-btn" data-event-id="${event.id}" style="min-width:40px;">
-          <i class="material-icons">
-            ${isEventInFavorites(event.id) ? 'favorite' : 'favorite_border'}
-          </i>
-        </button>
-      </div>
-    `;
+            <div class="card-content">
+                <span class="card-title">${event.name}</span>
+                <p>${formatted} – ${venue.name || "Veranstaltungsort"}</p>
+                <p><em>Kategorie: ${translated}</em></p>
+                <a href="${event.url}" target="_blank" style="color: purple">Mehr Infos</a>
+            </div>
+            <div class="card-action" style="display:flex;justify-content:space-between;align-items:center;">
+                <a href="${mapsUrl}" target="_blank">In Google Maps anzeigen</a>
+                <button class="btn-flat like-btn" data-event-id="${event.id}" style="min-width:40px;">
+                    <i class="material-icons">
+                        ${isEventInFavorites(event.id) ? 'favorite' : 'favorite_border'}
+                    </i>
+                </button>
+            </div>
+        `;
+
         container.appendChild(card);
 
-        // Like-Button Hook
         const likeBtn = card.querySelector('.like-btn');
         likeBtn.addEventListener('click', () => toggleFavorite(event, likeBtn));
     }
 }
+
 
 // -------------------- Favoriten-Logik --------------------
 function isEventInFavorites(eventId) {
