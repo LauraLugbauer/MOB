@@ -161,3 +161,12 @@ button.loading::after {
 #result {
     text-align: center;
 }
+
+@media (max-width: 600px) {
+    .btn-group a {
+        display: block;
+        margin: 10px auto;
+        width: 90%;
+        font-size: 1.2rem;
+    }
+}

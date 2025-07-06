@@ -18,6 +18,12 @@
     text-align: right;
 }
 
+a {
+    color: #4a148c; /* Lila */
+}
+
+
+
 /* --------------------------------------
    HERO
 -------------------------------------- */
@@ -164,6 +170,17 @@ body {
     transition: all 0.3s ease;
     border-radius: 30px;
 }
+
+@media (max-width: 600px) {
+    .btn-group a {
+        display: block;
+        margin: 10px auto;
+        width: 90%;
+        font-size: 1.2rem;
+    }
+}
+
+
 
 
 
