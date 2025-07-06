@@ -88,8 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // -------------------- Filter anwenden --------------------
-    applyFiltersBtn?.addEventListener('click', () => {
-        applyFilters();
+    applyFiltersBtn?.addEventListener('click', async () => {
+        await applyFilters();
         loadMoreBtn.style.display = 'none';
         loadLessBtn.style.display = 'none';
     });
@@ -123,7 +123,7 @@ async function fetchEvents(keyword = '', page = 0) {
     const events = data._embedded?.events || [];
 
     allEvents = allEvents.concat(events);
-    renderEvents(allEvents.slice(0, displayLimit));
+    await renderEvents(allEvents.slice(0, displayLimit));
 }
 
 // -------------------- Rendern der Events --------------------
@@ -203,7 +203,7 @@ function clearEvents() {
 
 
 // -------------------- Filter über alle geladenen Events --------------------
-function applyFilters() {
+async function applyFilters() {
     const selCat  = document.getElementById('categoryFilter').value.toLowerCase();
     const selMon  = document.getElementById('monthFilter').value;
     const selCity = document.getElementById('locationFilter').value.toLowerCase();
@@ -224,7 +224,7 @@ function applyFilters() {
         );
     });
 
-    renderEvents(filtered);
+    await renderEvents(filtered);
     document.getElementById('loadMoreBtn').style.display = 'none';
     document.getElementById('loadLessBtn').style.display = 'none';
     if (feedbackEl) {
@@ -277,8 +277,8 @@ async function renderFavorites() {
 }
 
 // automatisch auf favorites.html aufrufen
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     if (document.getElementById('favorites')) {
-        renderFavorites();
+        await renderFavorites();
     }
 });
