@@ -155,7 +155,7 @@ async function renderEvents(events) {
         card.innerHTML = `
             <div class="card-content">
                 <span class="card-title">${event.name}</span>
-                <p>${formatted} – ${venue.name || "Veranstaltungsort"}</p>
+                <p>${formatted} – ${venue.name || "Veranstaltungsort unter 'Mehr Infos'."}</p>
                 <p><em>Kategorie: ${translated}</em></p>
                 <a href="${event.url}" target="_blank" style="color: purple">Mehr Infos</a>
             </div>

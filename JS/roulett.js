@@ -35,9 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     spinBtn.addEventListener("click", async () => {
         // Kategorie global setzen
         selectedCategory = document
-            .getElementById("randomCategory")
-            .value
-            .toLowerCase();
+            .getElementById("randomCategory").value.toLowerCase();
 
         if (!selectedCategory) {
             M.toast({ html: "Bitte wähle eine Kategorie!", classes: "red" });
